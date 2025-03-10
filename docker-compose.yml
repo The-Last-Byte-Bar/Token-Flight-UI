@@ -1,12 +1,25 @@
 version: '3.8'
+
 services:
-  app:
-    build: .
+  token-flight-service:
+    build:
+      context: ./token-flight-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - PORT=8000
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "80:80"
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 30s
-      timeout: 10s
-      retries: 3 
+    depends_on:
+      - token-flight-service
+    environment:
+      - VITE_API_URL=http://token-flight-service:8000
+    restart: unless-stopped 

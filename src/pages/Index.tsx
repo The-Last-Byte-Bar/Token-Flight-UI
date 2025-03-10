@@ -6,11 +6,11 @@ import NautilusWallet from "@/components/NautilusWallet";
 import AirdropForm from "@/components/AirdropForm";
 import AnimatedToken from "@/components/AnimatedToken";
 import { GithubIcon, PenIcon } from "lucide-react";
+import { Token } from '@/lib/wallet';
 
 const Index = () => {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [tokenIds, setTokenIds] = useState<string[]>([]);
-  const [tokenBalances, setTokenBalances] = useState<Record<string, number>>({});
+  const [availableTokens, setAvailableTokens] = useState<Token[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -18,17 +18,16 @@ const Index = () => {
     console.log("Index component mounted");
   }, []);
 
-  const handleWalletConnect = (
-    address: string, 
-    fetchedTokenIds: string[] = [], 
-    fetchedTokenBalances: Record<string, number> = {}
-  ) => {
-    setWalletAddress(address);
-    setTokenIds(fetchedTokenIds);
-    setTokenBalances(fetchedTokenBalances);
+  const handleWalletConnect = (address: string, tokens: Token[]) => {
     console.log("Wallet connected:", address);
-    console.log("Token IDs:", fetchedTokenIds);
-    console.log("Token Balances:", fetchedTokenBalances);
+    console.log("Tokens:", tokens);
+    setWalletAddress(address);
+    setAvailableTokens(tokens);
+  };
+
+  const handleDisconnect = () => {
+    setWalletAddress(null);
+    setAvailableTokens([]);
   };
 
   return (
@@ -77,12 +76,14 @@ const Index = () => {
           </section>
           
           <section className="mt-8">
-            <AirdropForm 
-              walletConnected={!!walletAddress} 
-              walletAddress={walletAddress}
-              tokenIds={tokenIds}
-              tokenBalances={tokenBalances}
-            />
+            {walletAddress && (
+              <AirdropForm 
+                walletConnected={true}
+                walletAddress={walletAddress}
+                availableTokens={availableTokens}
+                onDisconnect={handleDisconnect}
+              />
+            )}
           </section>
           
           <section className="mt-12 max-w-3xl mx-auto text-center">
