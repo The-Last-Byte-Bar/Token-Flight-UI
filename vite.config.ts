@@ -8,6 +8,13 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      '/api/ergo': {
+        target: 'https://api.ergoplatform.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/ergo/, ''),
+      },
+    },
   },
   plugins: [
     react(),
